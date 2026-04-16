@@ -1,0 +1,11 @@
+source venv/bin/activate
+
+python main.py --im_path ./golden-retriever-dog.jpg --model_weights ./weights/vig_s_80.6.pth --model_variant vig_s_224_gelu --gt_label_idx 207 --gt_label_name "golden retriever" --cls_to_labels_path ./imagenet1000_clsidx_to_labels.txt --dino_config ./config/GroundingDINO_SwinT_OGC.py --dino_weights ./weights/groundingdino_swint_ogc.pth --sam_checkpoint ./weights/sam_vit_h_4b8939.pth --out_dir ./analysis_results
+
+python main_my.py --im_path ./golden-retriever-dog.jpg --model_weights ./weights/vig_s_80.6.pth --model_variant vig_s_224_gelu --save_raw
+
+python main_inf_dataset.py \
+  --im_path ./golden-retriever-dog.jpg \
+  --model_weights ./weights/vig_s_80.6.pth \
+  --model_variant vig_s_224_gelu \
+  --output_dir outputs_one

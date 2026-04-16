@@ -1,0 +1,411 @@
+{
+  "image_path": "golden-retriever-dog.jpg",
+  "model_variant": "vig_s_224_gelu",
+  "num_layers": 16,
+  "layer_metadata": [
+    {
+      "layer_index": 0,
+      "raw_feature_shape": [
+        1,
+        320,
+        14,
+        14
+      ],
+      "raw_edge_shape": [
+        2,
+        1,
+        196,
+        9
+      ],
+      "adapted_feature_shape": [
+        196,
+        320
+      ],
+      "adapted_edge_shape": [
+        2,
+        1,
+        196,
+        9
+      ]
+    },
+    {
+      "layer_index": 1,
+      "raw_feature_shape": [
+        1,
+        320,
+        14,
+        14
+      ],
+      "raw_edge_shape": [
+        2,
+        1,
+        196,
+        9
+      ],
+      "adapted_feature_shape": [
+        196,
+        320
+      ],
+      "adapted_edge_shape": [
+        2,
+        1,
+        196,
+        9
+      ]
+    },
+    {
+      "layer_index": 2,
+      "raw_feature_shape": [
+        1,
+        320,
+        14,
+        14
+      ],
+      "raw_edge_shape": [
+        2,
+        1,
+        196,
+        10
+      ],
+      "adapted_feature_shape": [
+        196,
+        320
+      ],
+      "adapted_edge_shape": [
+        2,
+        1,
+        196,
+        10
+      ]
+    },
+    {
+      "layer_index": 3,
+      "raw_feature_shape": [
+        1,
+        320,
+        14,
+        14
+      ],
+      "raw_edge_shape": [
+        2,
+        1,
+        196,
+        10
+      ],
+      "adapted_feature_shape": [
+        196,
+        320
+      ],
+      "adapted_edge_shape": [
+        2,
+        1,
+        196,
+        10
+      ]
+    },
+    {
+      "layer_index": 4,
+      "raw_feature_shape": [
+        1,
+        320,
+        14,
+        14
+      ],
+      "raw_edge_shape": [
+        2,
+        1,
+        196,
+        11
+      ],
+      "adapted_feature_shape": [
+        196,
+        320
+      ],
+      "adapted_edge_shape": [
+        2,
+        1,
+        196,
+        11
+      ]
+    },
+    {
+      "layer_index": 5,
+      "raw_feature_shape": [
+        1,
+        320,
+        14,
+        14
+      ],
+      "raw_edge_shape": [
+        2,
+        1,
+        196,
+        12
+      ],
+      "adapted_feature_shape": [
+        196,
+        320
+      ],
+      "adapted_edge_shape": [
+        2,
+        1,
+        196,
+        12
+      ]
+    },
+    {
+      "layer_index": 6,
+      "raw_feature_shape": [
+        1,
+        320,
+        14,
+        14
+      ],
+      "raw_edge_shape": [
+        2,
+        1,
+        196,
+        12
+      ],
+      "adapted_feature_shape": [
+        196,
+        320
+      ],
+      "adapted_edge_shape": [
+        2,
+        1,
+        196,
+        12
+      ]
+    },
+    {
+      "layer_index": 7,
+      "raw_feature_shape": [
+        1,
+        320,
+        14,
+        14
+      ],
+      "raw_edge_shape": [
+        2,
+        1,
+        196,
+        13
+      ],
+      "adapted_feature_shape": [
+        196,
+        320
+      ],
+      "adapted_edge_shape": [
+        2,
+        1,
+        196,
+        13
+      ]
+    },
+    {
+      "layer_index": 8,
+      "raw_feature_shape": [
+        1,
+        320,
+        14,
+        14
+      ],
+      "raw_edge_shape": [
+        2,
+        1,
+        196,
+        13
+      ],
+      "adapted_feature_shape": [
+        196,
+        320
+      ],
+      "adapted_edge_shape": [
+        2,
+        1,
+        196,
+        13
+      ]
+    },
+    {
+      "layer_index": 9,
+      "raw_feature_shape": [
+        1,
+        320,
+        14,
+        14
+      ],
+      "raw_edge_shape": [
+        2,
+        1,
+        196,
+        14
+      ],
+      "adapted_feature_shape": [
+        196,
+        320
+      ],
+      "adapted_edge_shape": [
+        2,
+        1,
+        196,
+        14
+      ]
+    },
+    {
+      "layer_index": 10,
+      "raw_feature_shape": [
+        1,
+        320,
+        14,
+        14
+      ],
+      "raw_edge_shape": [
+        2,
+        1,
+        196,
+        15
+      ],
+      "adapted_feature_shape": [
+        196,
+        320
+      ],
+      "adapted_edge_shape": [
+        2,
+        1,
+        196,
+        15
+      ]
+    },
+    {
+      "layer_index": 11,
+      "raw_feature_shape": [
+        1,
+        320,
+        14,
+        14
+      ],
+      "raw_edge_shape": [
+        2,
+        1,
+        196,
+        15
+      ],
+      "adapted_feature_shape": [
+        196,
+        320
+      ],
+      "adapted_edge_shape": [
+        2,
+        1,
+        196,
+        15
+      ]
+    },
+    {
+      "layer_index": 12,
+      "raw_feature_shape": [
+        1,
+        320,
+        14,
+        14
+      ],
+      "raw_edge_shape": [
+        2,
+        1,
+        196,
+        16
+      ],
+      "adapted_feature_shape": [
+        196,
+        320
+      ],
+      "adapted_edge_shape": [
+        2,
+        1,
+        196,
+        16
+      ]
+    },
+    {
+      "layer_index": 13,
+      "raw_feature_shape": [
+        1,
+        320,
+        14,
+        14
+      ],
+      "raw_edge_shape": [
+        2,
+        1,
+        196,
+        16
+      ],
+      "adapted_feature_shape": [
+        196,
+        320
+      ],
+      "adapted_edge_shape": [
+        2,
+        1,
+        196,
+        16
+      ]
+    },
+    {
+      "layer_index": 14,
+      "raw_feature_shape": [
+        1,
+        320,
+        14,
+        14
+      ],
+      "raw_edge_shape": [
+        2,
+        1,
+        196,
+        17
+      ],
+      "adapted_feature_shape": [
+        196,
+        320
+      ],
+      "adapted_edge_shape": [
+        2,
+        1,
+        196,
+        17
+      ]
+    },
+    {
+      "layer_index": 15,
+      "raw_feature_shape": [
+        1,
+        320,
+        14,
+        14
+      ],
+      "raw_edge_shape": [
+        2,
+        1,
+        196,
+        18
+      ],
+      "adapted_feature_shape": [
+        196,
+        320
+      ],
+      "adapted_edge_shape": [
+        2,
+        1,
+        196,
+        18
+      ]
+    }
+  ],
+  "logits_shape": [
+    1,
+    1000
+  ]
+}
