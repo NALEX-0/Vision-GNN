@@ -6,14 +6,15 @@ from typing import Any, Dict, List, Optional
 import torch
 
 from utils import image_to_tensor, run_model_inference
-from utils_my import (
+from utils2 import (
     load_model,
-    adapt_feature_tensor,
-    adapt_edge_tensor,
     summarize_adapted_feature,
     summarize_adapted_edges,
+    adapt_feature_tensor,
+    adapt_edge_tensor,
 )
 
+from metrics import compute_entropy_single_layer
 
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".bmp", ".webp"}
 
@@ -109,6 +110,7 @@ def infer_single_image(
 
         feat_summary = summarize_adapted_feature(feat_std)
         edge_summary = summarize_adapted_edges(edge_std, num_nodes=feat_summary["num_nodes"])
+        entropy_summary = compute_entropy_single_layer(feat_std)
 
         layer_row = {
             "image_path": image_path,
@@ -122,9 +124,14 @@ def infer_single_image(
             "edge_shape": edge_summary["edge_shape"],
             "num_edges": edge_summary["num_edges"],
             "avg_degree": edge_summary["avg_degree"],
-            "pooled_mean": feat_summary["pooled_mean"].tolist(),
-            "pooled_max": feat_summary["pooled_max"].tolist(),
+            "matrix_entropy": entropy_summary["entropy"],
+            "matrix_normalized_entropy": entropy_summary["normalized_entropy"],
+            "matrix_effective_rank": entropy_summary["effective_rank"],
+            "matrix_rank": entropy_summary["rank"],
+            # "pooled_mean": feat_summary["pooled_mean"].tolist(),
+            # "pooled_max": feat_summary["pooled_max"].tolist(),
         }
+
         layer_rows.append(layer_row)
 
     prediction_row = {

@@ -45,29 +45,6 @@ def load_model(model_variant: str, checkpoint_path: str, device: torch.device):
     return model
 
 
-def summarize_tensor(name: str, x: Any):
-    if torch.is_tensor(x):
-        print(
-            f"{name}: "
-            f"type=torch.Tensor, "
-            f"shape={tuple(x.shape)}, "
-            f"dtype={x.dtype}, "
-            f"device={x.device}"
-        )
-    elif isinstance(x, list):
-        print(f"{name}: type=list, len={len(x)}")
-        if len(x) > 0 and torch.is_tensor(x[0]):
-            print(
-                f"  first element: shape={tuple(x[0].shape)}, "
-                f"dtype={x[0].dtype}, "
-                f"device={x[0].device}"
-            )
-        else:
-            print(f"  first element type: {type(x[0]) if len(x) > 0 else 'N/A'}")
-    else:
-        print(f"{name}: type={type(x)}")
-
-
 def adapt_feature_tensor(x: torch.Tensor) -> torch.Tensor:
     """
     Convert a raw per-layer feature tensor into [N, D] for analysis.
@@ -137,79 +114,6 @@ def adapt_edge_tensor(x: Any) -> torch.Tensor:
     return x.detach().cpu()
 
 
-def run_and_save_image_embeddings(
-    image_path: str,
-    model: torch.nn.Module,
-    device: torch.device,
-    output_dir: str,
-    save_raw: bool = False,
-):
-    """Run one image through model and save embeddings + metadata like main_my.py."""
-    output_dir_path = Path(output_dir)
-    output_dir_path.mkdir(parents=True, exist_ok=True)
-
-    image_path_obj = Path(image_path)
-    image_stem = image_path_obj.stem
-
-    image_tensor = image_to_tensor(str(image_path_obj), device)
-    logits, edge_indexes_per_layer, block_features_per_layer = run_model_inference(model, image_tensor)
-
-    adapted_features: List[torch.Tensor] = []
-    adapted_edges: List[torch.Tensor] = []
-    layer_metadata: List[Dict[str, Any]] = []
-
-    for layer_idx, (feat, edge) in enumerate(zip(block_features_per_layer, edge_indexes_per_layer)):
-        feat_std = adapt_feature_tensor(feat)
-        edge_std = adapt_edge_tensor(edge)
-
-        adapted_features.append(feat_std)
-        adapted_edges.append(edge_std)
-
-        layer_metadata.append({
-            "layer_index": layer_idx,
-            "raw_feature_shape": list(feat.shape) if torch.is_tensor(feat) else None,
-            "raw_edge_shape": list(edge.shape) if torch.is_tensor(edge) else None,
-            "adapted_feature_shape": list(feat_std.shape),
-            "adapted_edge_shape": list(edge_std.shape),
-        })
-
-    summary = {
-        "image_path": str(image_path_obj),
-        "model_variant": type(model).__name__,
-        "num_layers": len(block_features_per_layer),
-        "layer_metadata": layer_metadata,
-        "logits_shape": list(logits.shape) if torch.is_tensor(logits) else None,
-    }
-
-    json_path = output_dir_path / f"{image_stem}_layer_summary.json"
-    with open(json_path, "w") as f:
-        import json
-        json.dump(summary, f, indent=2)
-
-    tensor_path = output_dir_path / f"{image_stem}_layer_embeddings.pt"
-    save_payload = {
-        "image_path": str(image_path_obj),
-        "model_variant": type(model).__name__,
-        "logits": logits.detach().cpu() if torch.is_tensor(logits) else logits,
-        "adapted_features": adapted_features,
-        "adapted_edges": adapted_edges,
-        "layer_metadata": layer_metadata,
-    }
-
-    if save_raw:
-        save_payload["raw_block_features_per_layer"] = [x.detach().cpu() for x in block_features_per_layer]
-        save_payload["raw_edge_indexes_per_layer"] = [x.detach().cpu() for x in edge_indexes_per_layer]
-
-    torch.save(save_payload, tensor_path)
-
-    return {
-        "json_path": str(json_path),
-        "tensor_path": str(tensor_path),
-        "summary": summary,
-    }
-
-
-
 
 def summarize_adapted_feature(feat: torch.Tensor) -> Dict[str, Any]:
     # feat: [N, D]
@@ -253,3 +157,5 @@ def summarize_adapted_edges(edge: torch.Tensor, num_nodes: int) -> Dict[str, Any
         summary["avg_degree"] = float(k)
 
     return summary
+
+
