@@ -9,3 +9,10 @@ python main_inf_dataset.py \
   --model_weights ./weights/vig_s_80.6.pth \
   --model_variant vig_s_224_gelu \
   --output_dir outputs_one
+
+python main_inf_dataset.py \
+  --im_dir ./ILSVRC2012_img_val \
+  --model_weights ./weights/vig_s_80.6.pth \
+  --model_variant vig_s_224_gelu \
+  --output_dir outputs_imagenet
+

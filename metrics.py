@@ -50,20 +50,19 @@ from typing import Any, Dict, List
 #     return { norm: [entropy_normalization(x, norm, N, D) for x in entropies] for norm in normalizations }
 
 
+# Prompt Entropy, LLM paper
 def compute_entropy_single_layer(
     z: torch.Tensor,
     alpha: float = 1.0,
     eps: float = 1e-12,
 ) -> Dict[str, Any]:
     """
-    Matrix-based entropy for one ViG layer.
+    Matrix-based entropy on the per-layer features
 
     Args:
         z: Tensor [N, D] (nodes x features)
         alpha: entropy order (1.0 = Shannon)
         eps: numerical stability
-        center: whether to remove feature mean
-
     """
 
     z = z.double() # better precision
@@ -120,7 +119,7 @@ def compute_entropy_single_layer(
     # Shannon entropy
     if alpha == 1.0:
         entropy = -(probs * torch.log(probs)).sum()
-    # Renyi entropy
+    #
     else:
         entropy = torch.log(torch.sum(probs ** alpha)) / (1.0 - alpha)
 

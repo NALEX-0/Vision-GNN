@@ -3,3 +3,6 @@ __pycache__/
 figures/
 venv/
 weights/
+ILSVRC2012_img_val/
+outputs_imagenet/layer_metrics.json
+outputs_imagenet/predictions.json
