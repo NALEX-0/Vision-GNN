@@ -15,6 +15,7 @@ from utils2 import (
 )
 
 from metrics import compute_entropy_single_layer
+from visualization import plot_matrix_entropy
 
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".bmp", ".webp"}
 
@@ -96,6 +97,7 @@ def infer_single_image(
     image_path: str,
     model: torch.nn.Module,
     device: torch.device,
+    # output_dir: Optional[Path] = None, #
 ) -> Dict[str, Any]:
     image_tensor = image_to_tensor(image_path, device)
     logits, edge_indexes_per_layer, block_features_per_layer = run_model_inference(model, image_tensor)
@@ -104,9 +106,18 @@ def infer_single_image(
 
     layer_rows: List[Dict[str, Any]] = []
 
+    # node_embed_dir = None #
+    # if output_dir is not None:
+    #     node_embed_dir = output_dir / "node_embeddings" / Path(image_path).stem
+    #     node_embed_dir.mkdir(parents=True, exist_ok=True) #
+
     for layer_idx, (feat, edge) in enumerate(zip(block_features_per_layer, edge_indexes_per_layer)):
         feat_std = adapt_feature_tensor(feat)
         edge_std = adapt_edge_tensor(edge)
+
+        # if node_embed_dir is not None: #
+        #     layer_feat_path = node_embed_dir / f"layer_{layer_idx:02d}_feat_std.pt"
+        #     torch.save(feat_std, layer_feat_path) #
 
         feat_summary = summarize_adapted_feature(feat_std)
         edge_summary = summarize_adapted_edges(edge_std, num_nodes=feat_summary["num_nodes"])
@@ -168,32 +179,72 @@ def main(args):
 
     print(f"Total images to process: {len(image_list)}")
 
-    all_predictions: List[Dict[str, Any]] = []
-    all_layer_rows: List[Dict[str, Any]] = []
+    if args.save_per_image:
+        for idx, image_path in enumerate(image_list, start=1):
+            image_name = Path(image_path).stem
+            image_output_dir = output_dir / image_name
+            image_output_dir.mkdir(parents=True, exist_ok=True)
 
-    for idx, image_path in enumerate(image_list, start=1):
-        print(f"[{idx}/{len(image_list)}] Processing: {image_path}")
-        try:
-            result = infer_single_image(
-                image_path=image_path,
-                model=model,
-                device=device,
-            )
-            all_predictions.append(result["prediction_row"])
-            all_layer_rows.extend(result["layer_rows"])
-        except Exception as e:
-            print(f"[ERROR] Failed on {image_path}: {e}")
+            print(f"[{idx}/{len(image_list)}] Processing: {image_path}")
+            print(f"Saving to: {image_output_dir}")
 
-    predictions_path = output_dir / "predictions.json"
-    layer_metrics_path = output_dir / "layer_metrics.json"
+            try:
+                result = infer_single_image(
+                    image_path=image_path,
+                    model=model,
+                    device=device,
+                )
 
-    with open(predictions_path, "w") as f:
-        json.dump(all_predictions, f, indent=2)
+                predictions_path = image_output_dir / "predictions.json"
+                layer_metrics_path = image_output_dir / "layer_metrics.json"
 
-    with open(layer_metrics_path, "w") as f:
-        json.dump(all_layer_rows, f, indent=2)
+                with open(predictions_path, "w") as f:
+                    json.dump([result["prediction_row"]], f, indent=2)
 
-    print("\n[Done]")
+                with open(layer_metrics_path, "w") as f:
+                    json.dump(result["layer_rows"], f, indent=2)
+
+                plot_matrix_entropy(str(layer_metrics_path), str(image_output_dir))
+
+            except Exception as e:
+                print(f"[ERROR] Failed on {image_path}: {e}")
+
+    else:
+        all_predictions: List[Dict[str, Any]] = []
+        all_layer_rows: List[Dict[str, Any]] = []
+
+        for idx, image_path in enumerate(image_list, start=1):
+            print(f"[{idx}/{len(image_list)}] Processing: {image_path}")
+
+            try:
+                result = infer_single_image(
+                    image_path=image_path,
+                    model=model,
+                    device=device,
+                )
+                all_predictions.append(result["prediction_row"])
+                all_layer_rows.extend(result["layer_rows"])
+
+            except Exception as e:
+                print(f"[ERROR] Failed on {image_path}: {e}")
+
+        predictions_path = output_dir / "predictions.json"
+        layer_metrics_path = output_dir / "layer_metrics.json"
+
+        with open(predictions_path, "w") as f:
+            json.dump(all_predictions, f, indent=2)
+
+        with open(layer_metrics_path, "w") as f:
+            json.dump(all_layer_rows, f, indent=2)
+
+        print("\n[Generating visualizations]")
+        plot_matrix_entropy(str(layer_metrics_path), str(output_dir))
+
+        print(f"Saved predictions to: {predictions_path}")
+        print(f"Saved layer metrics to: {layer_metrics_path}")
+
+
+
     print(f"Saved predictions to: {predictions_path}")
     print(f"Saved layer metrics to: {layer_metrics_path}")
 
@@ -219,6 +270,8 @@ if __name__ == "__main__":
     parser.add_argument("--output_dir", type=str, default="outputs_dataset", help="Directory to save results")
 
     parser.add_argument("--max_images", type=int, default=None, help="Optional limit on number of images")
+
+    parser.add_argument("--save_per_image", action="store_true", help="Save predictions, layer metrics, and visualizations separately for each image.")
 
     args = parser.parse_args()
     main(args)

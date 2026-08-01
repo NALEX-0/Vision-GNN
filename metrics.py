@@ -1,54 +1,6 @@
 import torch
 import numpy as np
 from typing import Any, Dict, List
-# import repitl.matrix_itl as itl
-
-
-# def compute_entropy(hidden_states, alpha=1.0, normalizations=["maxEntropy"], eps=1e-12):
-#     """
-#     Compute matrix-based entropy across ViG layers.
-
-#     Args:
-#         hidden_states: torch.Tensor with shape [L, N, D]
-#             L = layers
-#             N = nodes / patches
-#             D = feature channels
-#     """
-#     L, N, D = hidden_states.shape
-
-#     entropies = []
-
-#     for layer_idx in range(L):
-#         z = hidden_states[layer_idx].double()  # [N, D]
-
-#         # Optional but recommended
-#         z = z - z.mean(dim=0, keepdim=True)
-
-#         # Use smaller matrix for efficiency.
-#         # Non-zero eigenvalues of Z Z^T and Z^T Z are the same.
-#         if N > D:
-#             mat = z.T @ z   # [D, D]
-#         else:
-#             mat = z @ z.T   # [N, N]
-
-#         mat = 0.5 * (mat + mat.T)
-
-#         trace = torch.trace(mat)
-#         if trace <= eps:
-#             entropies.append(np.nan)
-#             continue
-
-#         mat = mat / trace
-
-#         try:
-#             ent = itl.matrixAlphaEntropy(mat, alpha=alpha).item()
-#         except Exception:
-#             ent = np.nan
-
-#         entropies.append(ent)
-
-#     return { norm: [entropy_normalization(x, norm, N, D) for x in entropies] for norm in normalizations }
-
 
 # Prompt Entropy, LLM paper
 def compute_entropy_single_layer(
@@ -67,17 +19,17 @@ def compute_entropy_single_layer(
 
     z = z.double() # better precision
 
-    # Center features (Gram matrix computes: Similarity = variation between nodes)
+    # Center features
     z = z - z.mean(dim=0, keepdim=True)
 
     N, D = z.shape
 
     # Build Gram /covariance matrix
     # use smaller matrix for efficiency, cause they both have same non-zero eigenvalues (?)
-    if N > D:
-        mat = z.T @ z      # [D, D]
-    else:
-        mat = z @ z.T      # [N, N]
+    # if N > D:
+    #     mat = z.T @ z      # [D, D]  feature to feature
+    # else:
+    mat = z @ z.T      # [N, N]  node to node
 
     # Ensure symmetry
     mat = 0.5 * (mat + mat.T)
@@ -125,7 +77,7 @@ def compute_entropy_single_layer(
 
     rank = int((eigvals > eps).sum().item())
 
-    # Maximum entropy when all eigenvalues are equal
+    # Normalize entropy
     if rank > 1:
         max_entropy = torch.log(torch.tensor(float(rank), device=z.device))
         normalized_entropy = entropy / max_entropy
@@ -143,3 +95,27 @@ def compute_entropy_single_layer(
         "feature_dim": D,
     }
 
+
+def format_embedding_table(
+    embeddings: torch.Tensor,
+    max_rows: int = 20,
+    max_cols: int = 12,
+) -> str:
+    arr = embeddings.detach().cpu().numpy()
+    n, d = arr.shape
+    row_end = min(n, max_rows)
+    col_end = min(d, max_cols)
+    header = [f"f{j}" for j in range(col_end)]
+    lines = ["      " + "  ".join(f"{h:>8}" for h in header)]
+
+    for i in range(row_end):
+        row_values = arr[i, :col_end]
+        formatted = "  ".join(f"{v:8.4f}" for v in row_values)
+        lines.append(f"{i:>4}  {formatted}")
+
+    if n > row_end:
+        lines.append(f"... ({n - row_end} more nodes)")
+    if d > col_end:
+        lines.append(f"... ({d - col_end} more features)")
+
+    return "\n".join(lines)

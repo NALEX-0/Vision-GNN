@@ -97,10 +97,14 @@ def adapt_feature_tensor(x: torch.Tensor) -> torch.Tensor:
 
 def adapt_edge_tensor(x: Any) -> torch.Tensor:
     """
-    Try to standardize raw graph connectivity into a CPU tensor.
+    Prepare raw graph connectivity for analysis.
 
-    We do not force a single graph format yet; we only detach and save it.
-    Later, after inspecting shapes, we can define a stricter adapter.
+    The function intentionally preserves the original graph
+    representation and only:
+    
+    - verifies the input is a tensor,
+    - detaches it from autograd,
+    - moves it to CPU.
 
     Possible formats in graph models include:
     - [2, E]
@@ -135,6 +139,29 @@ def summarize_adapted_feature(feat: torch.Tensor) -> Dict[str, Any]:
         "pooled_max": pooled_max.cpu().numpy().astype(np.float16),
     }
 
+# def summarize_adapted_edges(edge: torch.Tensor, num_nodes: int) -> Dict[str, Any]:
+#     edge = edge.cpu()
+
+#     summary = {
+#         "edge_shape": list(edge.shape),
+#         "num_edges": None,
+#         "avg_degree": None,
+#     }
+
+#     if edge.ndim == 2 and edge.shape[0] == 2:
+#         e = int(edge.shape[1])
+#         summary["num_edges"] = e
+#         summary["avg_degree"] = float(e / max(num_nodes, 1))
+#     elif edge.ndim == 3 and edge.shape[0] == 2:
+#         # ie: [2, N, k]
+#         n = int(edge.shape[1])
+#         k = int(edge.shape[2])
+#         e = n * k
+#         summary["num_edges"] = e
+#         summary["avg_degree"] = float(k)
+
+#     return summary
+
 def summarize_adapted_edges(edge: torch.Tensor, num_nodes: int) -> Dict[str, Any]:
     edge = edge.cpu()
 
@@ -145,17 +172,17 @@ def summarize_adapted_edges(edge: torch.Tensor, num_nodes: int) -> Dict[str, Any
     }
 
     if edge.ndim == 2 and edge.shape[0] == 2:
-        e = int(edge.shape[1])
-        summary["num_edges"] = e
-        summary["avg_degree"] = float(e / max(num_nodes, 1))
+        num_edges = int(edge.shape[1])
+        summary["num_edges"] = num_edges
+        summary["avg_degree"] = (
+            num_edges / max(num_nodes, 1)
+        )
+
     elif edge.ndim == 3 and edge.shape[0] == 2:
-        # ie: [2, N, k]
         n = int(edge.shape[1])
         k = int(edge.shape[2])
-        e = n * k
-        summary["num_edges"] = e
+        summary["num_edges"] = n * k
         summary["avg_degree"] = float(k)
 
     return summary
-
 

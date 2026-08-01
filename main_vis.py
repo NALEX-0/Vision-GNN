@@ -4,8 +4,10 @@ from visualization import plot_matrix_entropy
 
 
 def main():
-    layer_metrics_json = "outputs_imagenet/layer_metrics.json"
-    output_dir = "outputs_imagenet/plots"
+    layer_metrics_json = "outputs_imagenet_a/n01531178/0.000013_wheelbarrow _ wheelbarrow_0.95062554/layer_metrics.json"
+    output_dir = "outputs_imagenet_a/n01531178/0.000013_wheelbarrow _ wheelbarrow_0.95062554/plots"
+    # layer_metrics_json = "outputs_imagenet_ILSVRC2012_val_00000001/layer_metrics.json"
+    # output_dir = "outputs_imagenet_ILSVRC2012_val_00000001/plots"
 
     Path(output_dir).mkdir(parents=True, exist_ok=True)
 

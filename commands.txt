@@ -5,10 +5,10 @@ python main.py --im_path ./golden-retriever-dog.jpg --model_weights ./weights/vi
 python main_my.py --im_path ./golden-retriever-dog.jpg --model_weights ./weights/vig_s_80.6.pth --model_variant vig_s_224_gelu --save_raw
 
 python main_inf_dataset.py \
-  --im_path ./golden-retriever-dog.jpg \
+  --im_path ./ILSVRC2012_img_val/ILSVRC2012_val_00000001.JPEG \
   --model_weights ./weights/vig_s_80.6.pth \
   --model_variant vig_s_224_gelu \
-  --output_dir outputs_one
+  --output_dir "outputs_imagenet_ILSVRC2012_val_00000001"
 
 python main_inf_dataset.py \
   --im_dir ./ILSVRC2012_img_val \
@@ -16,3 +16,33 @@ python main_inf_dataset.py \
   --model_variant vig_s_224_gelu \
   --output_dir outputs_imagenet
 
+python main_inf_dataset.py \
+  --im_path "./imagenet-a/n01531178/0.000016_garbage truck _ doormat_0.8061608.jpg" \
+  --model_weights ./weights/vig_s_80.6.pth \
+  --model_variant vig_s_224_gelu \
+  --output_dir "outputs_imagenet_a/n01531178/0.000016_garbage truck _ doormat_0.8061608"
+
+python main_inf_dataset.py \
+  --im_dir "./imagenet-a/n01558993" \
+  --model_weights ./weights/vig_s_80.6.pth \
+  --model_variant vig_s_224_gelu \
+  --output_dir "outputs_imagenet_a/n01558993" \
+  --save_per_image
+
+python main_inf_dataset.py \
+  --im_dir "./ILSVRC2012_img_val" \
+  --model_weights ./weights/vig_s_80.6.pth \
+  --model_variant vig_s_224_gelu \
+  --output_dir "outputs_ILSVRC2012_img_val" \
+  --max_images 100 \
+  --save_per_image
+
+python visualize_node_embeddings.py \
+  --node_embeddings_dir outputs_imagenet_a-n01498041/node_embeddings \
+  --output_dir outputs_imagenet_a-n01498041/node_embeddings_plots \
+  --image_name golden-retriever-dog \
+  --layer 0 \
+  --print_table
+
+
+ToDo:
